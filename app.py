@@ -3,7 +3,7 @@ import gradio as gr
 from transformers import pipeline
 
 # Automatically grab the secret token you set in your Space settings
-hf_token = os.getenv("SCA")
+hf_token = os.getenv("SCAhf_pPQGFjhkEypRhCxOicyEyDAcQEgmVBLsXs")
 
 # Pass the token explicitly into the pipeline configuration
 pipe = pipeline(
