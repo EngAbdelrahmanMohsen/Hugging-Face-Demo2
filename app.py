@@ -1,37 +1,33 @@
-from transformers import pipeline
 import gradio as gr
+from transformers import pipeline
 
-model = pipeline("summarization")
+# Safe to use the real model now—Hugging Face infrastructure can handle it!
+pipe = pipeline("text-generation", model="meta-llama/Llama-3.2-1B-Instruct")
 
-
-# 1. Initialize your pipeline
-pipe = pipeline("text-generation", model="HuggingFaceTB/SmolLM-135M-Instruct")
-
-# 2. DEFINE THE FUNCTION FIRST (Make sure it is named 'predict')
 def predict(user_input):
-    # 1. Structure messages with a strict System Prompt telling it to summarize
     messages = [
-        {"role": "system", "content": "You are a helpful assistant that summarizes text concisely."},
-        {"role": "user", "content": f"Summarize this text: {user_input}"}
+        {
+            "role": "system", 
+            "content": "You are a strict text-summarization bot. Output ONLY the concise summary. Do not write introductions or explanations."
+        },
+        {
+            "role": "user", 
+            "content": f"Summarize this text in one or two sentences: {user_input}"
+        }
     ]
     
-    # 2. Generate the response
-    outputs = pipe(messages, max_new_tokens=100)
+    outputs = pipe(messages, max_new_tokens=150)
     
-    # 3. FIX: Extract ONLY the assistant's content from the response
-    # The output structure is: [{'generated_text': [...]}]
+    # Extract the clean assistant response text
     conversation = outputs[0]['generated_text']
-    
-    # Grab the very last message in the conversation (which is the assistant's reply)
     assistant_reply = conversation[-1]['content']
     
-    return assistant_reply
+    return assistant_reply.strip()
 
-# 3. CALL THE INTERFACE AT THE BOTTOM
 textbox = gr.Textbox(placeholder="Enter text to summarize...", lines=4)
 
 gr.Interface(
-    fn=predict,  # This matches the function name above perfectly now!
+    fn=predict, 
     inputs=textbox, 
     outputs="text"
 ).launch()
