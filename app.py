@@ -3,24 +3,24 @@ import gradio as gr
 
 model = pipeline("summarization")
 
-# In app.py
+
+# 1. Initialize your pipeline
 pipe = pipeline("text-generation", model="HuggingFaceTB/SmolLM-135M-Instruct")
 
-text_to_summarize = "Your long text goes here..."
+# 2. DEFINE THE FUNCTION FIRST (Make sure it is named 'predict')
+def predict(user_input):
+    # If using a chat model structure:
+    messages = [{"role": "user", "content": user_input}]
+    outputs = pipe(messages, max_new_tokens=150)
+    
+    # Extract the text output depending on your model's format
+    return outputs[0]['generated_text']
 
-messages = [
-    {"role": "system", "content": "You are a helpful assistant that summarizes text concisely."},
-    {"role": "user", "content": f"Summarize the following text:\n\n{text_to_summarize}"}
-]
+# 3. CALL THE INTERFACE AT THE BOTTOM
+textbox = gr.Textbox(placeholder="Enter text to summarize...", lines=4)
 
-# 3. Generate response
-outputs = pipe(messages, max_new_tokens=150)
-summary = outputs[0]["generated_text"][-1]["content"]
-
-print(summary)
-
-with gr.Blocks() as demo:
-    textbox = gr.Textbox(placeholder="Enter text block to summarize", lines=4)
-    gr.Interface(fn=predict, inputs=textbox, outputs="text")
-
-demo.launch()
+gr.Interface(
+    fn=predict,  # This matches the function name above perfectly now!
+    inputs=textbox, 
+    outputs="text"
+).launch()
