@@ -1,14 +1,22 @@
+import os
 import gradio as gr
 from transformers import pipeline
 
-# Safe to use the real model now—Hugging Face infrastructure can handle it!
-pipe = pipeline("text-generation", model="meta-llama/Llama-3.2-1B-Instruct")
+# Automatically grab the secret token you set in your Space settings
+hf_token = os.getenv("SCA")
+
+# Pass the token explicitly into the pipeline configuration
+pipe = pipeline(
+    "text-generation", 
+    model="meta-llama/Llama-3.2-1B-Instruct",
+    token=hf_token
+)
 
 def predict(user_input):
     messages = [
         {
             "role": "system", 
-            "content": "You are a strict text-summarization bot. Output ONLY the concise summary. Do not write introductions or explanations."
+            "content": "You are a strict text-summarization bot. Output ONLY the concise summary."
         },
         {
             "role": "user", 
@@ -18,7 +26,6 @@ def predict(user_input):
     
     outputs = pipe(messages, max_new_tokens=150)
     
-    # Extract the clean assistant response text
     conversation = outputs[0]['generated_text']
     assistant_reply = conversation[-1]['content']
     
@@ -26,8 +33,4 @@ def predict(user_input):
 
 textbox = gr.Textbox(placeholder="Enter text to summarize...", lines=4)
 
-gr.Interface(
-    fn=predict, 
-    inputs=textbox, 
-    outputs="text"
-).launch()
+gr.Interface(fn=predict, inputs=textbox, outputs="text").launch()
