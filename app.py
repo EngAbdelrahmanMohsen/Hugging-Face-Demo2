@@ -1,10 +1,14 @@
 import os
 import gradio as gr
 from transformers import pipeline
-
+from huggingface_hub import login
 
 
 hf_token = os.getenv("SCA")
+if hf_token:
+    login(token=hf_token)
+else:
+    print("Warning: SCA token environment variable is empty!")
 
 # Pass the token explicitly into the pipeline configuration
 pipe = pipeline(
