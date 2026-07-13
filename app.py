@@ -4,7 +4,7 @@ import gradio as gr
 model = pipeline("summarization")
 
 # In app.py
-pipe = pipeline("text-generation", model="sshleifer/tiny-gpt2")
+pipe = pipeline("text-generation", model="HuggingFaceTB/SmolLM-135M-Instruct")
 
 text_to_summarize = "Your long text goes here..."
 
